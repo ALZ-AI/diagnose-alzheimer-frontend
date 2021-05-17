@@ -1,5 +1,6 @@
 import React from "react";
 import ALZAI from "./images/alzai.jpg";
+import styles from "./style.module.scss";
 
 class App extends React.Component {
 
@@ -11,8 +12,8 @@ class App extends React.Component {
 	render() {
 
 		return (
-			<div className="">
-				<img src={ALZAI} />
+			<div className={styles.container}>
+				<div>enes ince</div>
 			</div>
 		);
 
