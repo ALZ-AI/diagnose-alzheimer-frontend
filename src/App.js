@@ -1,6 +1,6 @@
 import React from "react";
-import ALZAI from "./images/alzai.jpg";
 import styles from "./style.module.scss";
+import FileUpload from "./components/FileUpload/FileUpload";
 
 class App extends React.Component {
 
@@ -13,7 +13,7 @@ class App extends React.Component {
 
 		return (
 			<div className={styles.container}>
-				<div>enes ince</div>
+				<FileUpload />
 			</div>
 		);
 
