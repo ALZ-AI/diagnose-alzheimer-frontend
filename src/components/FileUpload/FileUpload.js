@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import Dropzone from "react-dropzone";
+
 // TODO: import styles from "./FileUpload.module.scss";
 
 class FileUpload extends React.Component {
@@ -8,31 +9,80 @@ class FileUpload extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            uploadedImage: [],
+            file: null,
+            uploadedImage: null,
             errorMessages: []
         };
-        this.onDropAccepted = this.onDropAccepted.bind(this);
-        this.onDropRejected = this.onDropRejected.bind(this);
-        this.produceErrorMessage = this.produceErrorMessage.bind(this);
     }
 
-    post() {
+
+    getBase64 = file => {
+        return new Promise(resolve => {
+            let fileInfo;
+            let baseURL = "";
+            // Make new FileReader
+            let reader = new FileReader();
+
+            // Convert the file to base64 text
+            reader.readAsDataURL(file);
+
+            // on reader load somthing...
+            reader.onload = () => {
+                // Make a fileInfo Object
+                console.log("Called", reader);
+                baseURL = reader.result;
+                console.log(baseURL);
+                resolve(baseURL);
+            };
+            console.log(fileInfo);
+        });
+    };
+    
+    
+    predict = async () => {
         const URL = "";
 
-        axios.post(URL);
-    }
+        try {
 
-    onDropAccepted(files) {
+            const response = await axios.post(URL, {
+                headers: { "Accept": "application/json" }
+            });
+
+            if (!response)
+                throw Error("Internet connection is weak");
+            
+            console.log(response);
+
+            
+
+        }
+        catch(error) {
+            throw new Error(error);
+        }
+    }
+    
+    onDropAccepted = async files => {
         // * There is only one file in files variables
         const file = files[0];
         const uploadedImage = URL.createObjectURL(file);
         this.setState({
+            file,
             uploadedImage,
             errorMessages: []
         });
+        const response = await axios({
+            method: "post",
+            url: "https://u4omlv2i51.execute-api.eu-central-1.amazonaws.com/dev/example-function",
+            headers: {},
+            data: {
+                name: "enesince",
+                image: ""
+            }
+        });
+        console.log(response);
     }
 
-    produceErrorMessage(errorCode) {
+    produceErrorMessage = errorCode => {
         const codeMessages = {
             "too-many-files": "Lütfen sadece 1 dosya yükleyin",
             "file-invalid-type": "Sadece resim formatındaki dosyaları yükleyebilirsiniz"
@@ -46,11 +96,10 @@ class FileUpload extends React.Component {
         }
     }
 
-    onDropRejected(files) {
-        alert("merhanba");
+    onDropRejected = files => {
         let errorCodes = [];
 
-        files.map(item => {
+        files.foreach(item => {
             errorCodes.push(item.errors[0].code);
         });
         errorCodes = [...new Set(errorCodes)];
@@ -59,7 +108,7 @@ class FileUpload extends React.Component {
             return this.produceErrorMessage(errorCode);
         });
 
-        this.setState({ errorMessages });
+        this.setState({ errorMessages, uploadedImage: null, file: null });
     }
 
     render() {
@@ -83,7 +132,7 @@ class FileUpload extends React.Component {
                 </ul>
                 }
                 {this.state.uploadedImage &&
-                <img src={this.state.uploadedImage} width={200} />}
+                <img src={this.state.uploadedImage} width={200} alt="Uploaded" />}
             </div>
         );
 
