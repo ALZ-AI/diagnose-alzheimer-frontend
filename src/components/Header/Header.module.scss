@@ -1,0 +1,23 @@
+.header {
+    $logo_size: 50px;
+    $header_height: 80px;
+
+    height: $header_height;
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+
+    .logo {
+        width: $logo_size;
+        height: $logo_size;
+    }
+    .menu-items {
+        display: flex;
+        gap: 30px;
+        list-style: none;
+        justify-self: stretch;
+        margin-left: auto;
+    }
+}
