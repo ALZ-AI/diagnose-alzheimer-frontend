@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import Dropzone from "react-dropzone";
+import styles from "./FileUpload.module.scss";
 
 // TODO: import styles from "./FileUpload.module.scss";
 
@@ -18,8 +19,8 @@ class FileUpload extends React.Component {
 
     getBase64 = file => {
         return new Promise(resolve => {
-            let fileInfo;
             let baseURL = "";
+
             // Make new FileReader
             let reader = new FileReader();
 
@@ -29,12 +30,9 @@ class FileUpload extends React.Component {
             // on reader load somthing...
             reader.onload = () => {
                 // Make a fileInfo Object
-                console.log("Called", reader);
                 baseURL = reader.result;
-                console.log(baseURL);
                 resolve(baseURL);
             };
-            console.log(fileInfo);
         });
     };
     
@@ -52,9 +50,6 @@ class FileUpload extends React.Component {
                 throw Error("Internet connection is weak");
             
             console.log(response);
-
-            
-
         }
         catch(error) {
             throw new Error(error);
@@ -65,21 +60,40 @@ class FileUpload extends React.Component {
         // * There is only one file in files variables
         const file = files[0];
         const uploadedImage = URL.createObjectURL(file);
-        this.setState({
-            file,
-            uploadedImage,
-            errorMessages: []
-        });
-        const response = await axios({
-            method: "post",
-            url: "https://u4omlv2i51.execute-api.eu-central-1.amazonaws.com/dev/example-function",
-            headers: {},
-            data: {
-                name: "enesince",
-                image: ""
-            }
-        });
-        console.log(response);
+        try {
+            const base64_image = this.getBase64(file);
+
+            console.log(base64_image);
+            return;
+            const response = await axios({
+                method: "post",
+                url: "https://u4omlv2i51.execute-api.eu-central-1.amazonaws.com/dev/example-function",
+                headers: {},
+                data: {
+                    name: "enesince",
+                    image: base64_image
+                }
+            }).catch(error => {
+                if (error.response) {
+                    // client received an error response (5xx, 4xx)
+                } else if (error.request) {
+                    // client never received a response, or request never left
+                }
+            });
+            
+            
+
+            this.setState({
+                file,
+                uploadedImage,
+                errorMessages: []
+            });
+            console.log(response);
+        }
+        catch(error) {
+
+        }
+        
     }
 
     produceErrorMessage = errorCode => {
@@ -99,7 +113,7 @@ class FileUpload extends React.Component {
     onDropRejected = files => {
         let errorCodes = [];
 
-        files.foreach(item => {
+        files.map(item => {
             errorCodes.push(item.errors[0].code);
         });
         errorCodes = [...new Set(errorCodes)];
@@ -111,12 +125,26 @@ class FileUpload extends React.Component {
         this.setState({ errorMessages, uploadedImage: null, file: null });
     }
 
+    onDragEnter = sth => {
+        console.log("merhaba dünya");
+    }
+
+    onDragLeave = sth => {
+        console.log("güle güle");
+    }
+
     render() {
         return (
-            <div>
-                <Dropzone accept="image/*" maxFiles={1} onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected}>
+            <div style={styles.fileUploadContainer}>
+                <Dropzone accept="image/*"
+                    maxFiles={1}
+                    onDropAccepted={this.onDropAccepted}
+                    onDropRejected={this.onDropRejected}
+                    onDragEnter={this.onDragEnter}
+                    onDragLeave={this.onDragLeave}
+                >
                     {({ getRootProps, getInputProps }) => (
-                        <section className="container">
+                        <section>
                             <div {...getRootProps({ className: 'dropzone' })} style={{
                                 cursor: "copy", background: "red", height: 300, fontFamily: "roboto"
                             }}>

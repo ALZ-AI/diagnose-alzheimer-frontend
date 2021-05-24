@@ -15,17 +15,17 @@ class Header extends React.Component {
                     <img src={Logo} alt="Menu Icon" className={styles["logo"]} />
                 </a>
                 <ul className={styles["menu-items"]}>
-                    <a>
-                        <li>Ana Sayfa</li>
+                    <a href="#home">
+                        <li>Home</li>
                     </a>
-                    <a>
-                        <li>Hakkımızda</li>
+                    <a href="#about-us">
+                        <li>About Us</li>
                     </a>
-                    <a>
-                        <li>Sponsorlarımız</li>
+                    <a href="#our-sponsors">
+                        <li>Our Sponsors</li>
                     </a>
-                    <a>
-                        <li>İletişim</li>
+                    <a href="#contact-us">
+                        <li>Contact Us</li>
                     </a>
                 </ul>
             </header>

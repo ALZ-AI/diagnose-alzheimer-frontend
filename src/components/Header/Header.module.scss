@@ -19,5 +19,12 @@
         list-style: none;
         justify-self: stretch;
         margin-left: auto;
+        a {
+            text-decoration: none;
+            color: rgba($color: #fff, $alpha: 0.87);
+            &:hover {
+                color: rgba($color: #fff, $alpha: 0.70)
+            }
+        }
     }
 }
