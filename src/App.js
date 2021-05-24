@@ -1,20 +1,24 @@
 import React from "react";
 import styles from "./style.module.scss";
 import FileUpload from "./components/FileUpload/FileUpload";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
+import Content from "./components/Content/Content";
 
 class App extends React.Component {
-
-	constructor(props) {
-		super(props);
-	}
-
 
 	render() {
 
 		return (
+		
 			<div className={styles.container}>
-				<FileUpload />
+				<Header />
+				<Content>
+					<FileUpload />
+				</Content>
+				<Footer />
 			</div>
+		
 		);
 
 	}
