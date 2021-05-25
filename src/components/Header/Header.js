@@ -10,7 +10,7 @@ class Header extends React.Component {
 
     render() {
         return (
-            <header className={styles.header}>
+            <header className={styles["header"]}>
                 <a href="/">
                     <img src={Logo} alt="Menu Icon" className={styles["logo"]} />
                 </a>
