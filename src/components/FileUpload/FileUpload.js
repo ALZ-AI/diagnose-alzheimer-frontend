@@ -3,8 +3,6 @@ import axios from "axios";
 import Dropzone from "react-dropzone";
 import styles from "./FileUpload.module.scss";
 
-// TODO: import styles from "./FileUpload.module.scss";
-
 class FileUpload extends React.Component {
 
     constructor(props) {
@@ -14,6 +12,8 @@ class FileUpload extends React.Component {
             uploadedImage: null,
             errorMessages: []
         };
+
+        this.fileUploadContainer = React.createRef();
     }
 
 
@@ -35,65 +35,45 @@ class FileUpload extends React.Component {
             };
         });
     };
-    
-    
+     
+
     predict = async () => {
-        const URL = "";
+        const API_URL = process.env.REACT_APP_API_URL;
+        const base64_image = this.getBase64(this.state.file);
+        console.log(base64_image);
+        const response = await axios({
+            method: "post",
+            url: API_URL,
+            headers: { "Content-Type": "application/json" },
+            data: {
+                image: base64_image
+            }
+        }).catch(error => {
+            // TODO: Handling http errors
+            if (error.response) {
+                // client received an error response (5xx, 4xx)
+            }
+            else if (error.request) {
+                // client never received a response, or request never left
+            }
+        });
 
-        try {
+        console.log(response)
 
-            const response = await axios.post(URL, {
-                headers: { "Accept": "application/json" }
-            });
-
-            if (!response)
-                throw Error("Internet connection is weak");
-            
-            console.log(response);
-        }
-        catch(error) {
-            throw new Error(error);
-        }
+        // TODO: Create response UI
     }
     
     onDropAccepted = async files => {
         // * There is only one file in files variables
         const file = files[0];
         const uploadedImage = URL.createObjectURL(file);
-        try {
-            const base64_image = this.getBase64(file);
+        this.fileUploadContainer.current.classList.remove(styles["drag-over"]);
 
-            console.log(base64_image);
-            return;
-            const response = await axios({
-                method: "post",
-                url: "https://u4omlv2i51.execute-api.eu-central-1.amazonaws.com/dev/example-function",
-                headers: {},
-                data: {
-                    name: "enesince",
-                    image: base64_image
-                }
-            }).catch(error => {
-                if (error.response) {
-                    // client received an error response (5xx, 4xx)
-                } else if (error.request) {
-                    // client never received a response, or request never left
-                }
-            });
-            
-            
-
-            this.setState({
-                file,
-                uploadedImage,
-                errorMessages: []
-            });
-            console.log(response);
-        }
-        catch(error) {
-
-        }
-        
+        this.setState({
+            file,
+            uploadedImage,
+            errorMessages: []
+        });
     }
 
     produceErrorMessage = errorCode => {
@@ -121,47 +101,58 @@ class FileUpload extends React.Component {
         const errorMessages = errorCodes.map(errorCode => {
             return this.produceErrorMessage(errorCode);
         });
+        this.fileUploadContainer.current.classList.remove(styles["drag-over"]);
 
         this.setState({ errorMessages, uploadedImage: null, file: null });
     }
 
-    onDragEnter = sth => {
-        console.log("merhaba dünya");
+    onDragEnter = () => {
+        this.fileUploadContainer.current.classList.add(styles["drag-over"]);
     }
 
-    onDragLeave = sth => {
-        console.log("güle güle");
+    onDragLeave = () => {
+        this.fileUploadContainer.current.classList.remove(styles["drag-over"]);
     }
 
     render() {
         return (
-            <div style={styles.fileUploadContainer}>
-                <Dropzone accept="image/*"
-                    maxFiles={1}
-                    onDropAccepted={this.onDropAccepted}
-                    onDropRejected={this.onDropRejected}
-                    onDragEnter={this.onDragEnter}
-                    onDragLeave={this.onDragLeave}
-                >
-                    {({ getRootProps, getInputProps }) => (
-                        <section>
-                            <div {...getRootProps({ className: 'dropzone' })} style={{
-                                cursor: "copy", background: "red", height: 300, fontFamily: "roboto"
-                            }}>
+            <React.Fragment>
+                <div className={styles["container"]}>
+                    <Dropzone accept="image/*"
+                        maxFiles={1}
+                        onDropAccepted={this.onDropAccepted}
+                        onDropRejected={this.onDropRejected}
+                        onDragEnter={this.onDragEnter}
+                        onDragLeave={this.onDragLeave}
+                    >
+                        {({ getRootProps, getInputProps }) => (
+                            <div
+                                {...getRootProps({ className: 'dropzone' })}
+                                className={styles["file-upload--container"]}
+                                ref={this.fileUploadContainer} >
                                 <input {...getInputProps()} multiple={false} />
-                                <p>Drag 'n' drop some files here, or click to select files</p>
+                                <p>Drag an image to learn the result</p>
                             </div>
-                        </section>
-                    )}
-                </Dropzone>
-                {this.state.errorMessages &&
-                <ul>
-                    {this.state.errorMessages.map(errorMessage => <li key={Math.random()}>{errorMessage}</li>)}
-                </ul>
-                }
-                {this.state.uploadedImage &&
-                <img src={this.state.uploadedImage} width={200} alt="Uploaded" />}
-            </div>
+                        )}
+                    </Dropzone>
+                    <div className={styles["file-upload--output"]}>
+                        <div className={styles["error"]}></div>
+                        {this.state.uploadedImage &&
+                        <React.Fragment>
+                            <div className={styles["uploaded-image"]}>
+                                <img src={this.state.uploadedImage} alt="Uploaded" />
+                            </div>
+                            <button onClick={this.predict}>Get Results</button>
+                        </React.Fragment>
+                        }
+                    </div>
+                    {this.state.errorMessages &&
+                    <ul>
+                        {this.state.errorMessages.map(errorMessage => <li key={Math.random()}>{errorMessage}</li>)}
+                    </ul>
+                    }
+                </div>
+            </React.Fragment>
         );
 
     }
