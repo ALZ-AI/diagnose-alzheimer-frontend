@@ -15,7 +15,6 @@ class App extends React.Component {
 				<div id="home"></div>
 				<Header />
 				<Content>
-					<div style={{height: "80vh"}}></div>
 					<FileUpload />
 					<div style={{height: "80vh"}}></div>
 				</Content>

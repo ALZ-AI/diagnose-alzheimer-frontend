@@ -6,7 +6,7 @@ function Content(props) {
 
 
     return (
-        <div style={{flex: "1 0 auto", background: "purple"}}>
+        <div style={{flex: "1 0 auto"}}>
             {props.children}
         </div>
     )
