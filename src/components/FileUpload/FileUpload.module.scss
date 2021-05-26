@@ -8,44 +8,53 @@ $file_upload_width: Min(90%, 800px);
     align-items: center;
 }
 
-.file-upload--container {
-    $border_width: 2px;
-    $padding: 10px;
-    
-    cursor: copy;
-    height: 200px;
-    padding: $padding + $border_width;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.file-upload--wrapper {
     width: $file_upload_width;
-    & > * + * {
-        margin-top: 20px;
-    }
-    &::after {
-        border: $border_width solid #555;
-        content: "";
-        position: absolute;
-        border-radius: 2px;
-        top: 0;
-        left: 0;
-        width: calc(100% - #{$border_width * 2});
-        height: calc(100% - #{$border_width * 2});
-    }
-    &.drag-over {
+    cursor: grabbing;
+    .file-upload--container {
+        $border_width: 2px;
+        $padding: 10px;
+        
+        height: 200px;
+        padding: $padding + $border_width;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        & > * + * {
+            margin-top: 20px;
+        }
         &::after {
-            border: $border_width dashed #bdbdbd;
+            content: "";
+            border: $border_width solid #555;
+            position: absolute;
+            border-radius: 2px;
+            top: 0;
+            left: 0;
+            width: calc(100% - #{$border_width * 2});
+            height: calc(100% - #{$border_width * 2});
+        }
+        &.drag-over {
+            &::after {
+                border: $border_width dashed #bdbdbd;
+            }
+        }
+    }
+    &.loading {
+        cursor: not-allowed;
+        .file-upload--container {
+            pointer-events: none;
         }
     }
 }
 
 .file-upload--output {
     height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: $file_upload_width;
-    .error {
-
-    }
+    gap: 15px;
 
     .uploaded-image {
         display: flex;
@@ -66,5 +75,38 @@ $file_upload_width: Min(90%, 800px);
         padding: 10px 20px;
         cursor: pointer;
         border: none;
+        margin: 0 auto;
+    }
+
+    h2 {
+        margin: 0 auto;
+    }
+}
+
+
+.loading-gif {
+    display: none;
+    margin-top: 20px;
+    width: 40px;
+    height: 40px;
+    &::after {
+        content: " ";
+        display: block;
+        width: 32px;
+        height: 32px;
+        margin: 1px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        border-color: #fff transparent #fff transparent;
+        animation: loading 1.2s linear infinite;
+    }
+}
+
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }

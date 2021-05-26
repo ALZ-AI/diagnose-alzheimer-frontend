@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import Dropzone from "react-dropzone";
 import styles from "./FileUpload.module.scss";
+import resolve from "resolve";
 
 class FileUpload extends React.Component {
 
@@ -10,10 +11,13 @@ class FileUpload extends React.Component {
         this.state = {
             file: null,
             uploadedImage: null,
-            errorMessages: []
+            errorMessages: [],
+            prediction: null
         };
 
         this.fileUploadContainer = React.createRef();
+        this.fileUploadWrapper = React.createRef();
+        this.loadingRef = React.createRef();
     }
 
 
@@ -38,27 +42,46 @@ class FileUpload extends React.Component {
      
 
     predict = async () => {
+        this.fileUploadWrapper.current.classList.add(styles["loading"]);
+        this.loadingRef.current.style.display = "block";
+
         const API_URL = process.env.REACT_APP_API_URL;
-        const base64_image = this.getBase64(this.state.file);
-        console.log(base64_image);
-        const response = await axios({
-            method: "post",
-            url: API_URL,
-            headers: { "Content-Type": "application/json" },
-            data: {
-                image: base64_image
-            }
-        }).catch(error => {
+        const base64_image = await this.getBase64(this.state.file).then(base64_image => {
+            let base64_image_array = base64_image.split(",");
+            base64_image_array.shift();
+            return base64_image_array.join(",");
+        });
+        
+        const data = JSON.stringify({
+            image: base64_image
+        })
+
+        const config = {
+            timeout: 30000
+        };
+        
+
+        const response_body = await axios.post(API_URL, data, config)
+        .then(response => response.data)
+        .catch(error => {
+            console.log("hata verdi");
             // TODO: Handling http errors
             if (error.response) {
+                console.log(error.response);
                 // client received an error response (5xx, 4xx)
             }
             else if (error.request) {
+                console.log(error.request);
                 // client never received a response, or request never left
             }
-        });
+        }).finally(() => {
+            this.fileUploadWrapper.current.classList.remove(styles["loading"]);
+            this.loadingRef.current.style.display = "none";
+        })
 
-        console.log(response)
+        const prediction = response_body.prediction;
+        
+        this.setState({ prediction })
 
         // TODO: Create response UI
     }
@@ -72,7 +95,8 @@ class FileUpload extends React.Component {
         this.setState({
             file,
             uploadedImage,
-            errorMessages: []
+            errorMessages: [],
+            prediction: null
         });
     }
 
@@ -127,22 +151,30 @@ class FileUpload extends React.Component {
                     >
                         {({ getRootProps, getInputProps }) => (
                             <div
+                                className={styles["file-upload--wrapper"]}
+                                ref={this.fileUploadWrapper}
+                                >
+                            <div
                                 {...getRootProps({ className: 'dropzone' })}
                                 className={styles["file-upload--container"]}
-                                ref={this.fileUploadContainer} >
-                                <input {...getInputProps()} multiple={false} />
+                                ref={this.fileUploadContainer}
+                                >
+                                <input {...getInputProps()} multiple={false}/>
                                 <p>Drag an image to learn the result</p>
+                            </div>
                             </div>
                         )}
                     </Dropzone>
                     <div className={styles["file-upload--output"]}>
+                        <div className={styles["loading-gif"]} ref={this.loadingRef}></div>
                         <div className={styles["error"]}></div>
                         {this.state.uploadedImage &&
                         <React.Fragment>
+                            {!this.state.prediction && <button onClick={() => this.predict()}>Get Results</button>}
+                            {this.state.prediction && <h2 style={{fontSize: 36}}>{this.state.prediction}</h2>}
                             <div className={styles["uploaded-image"]}>
                                 <img src={this.state.uploadedImage} alt="Uploaded" />
                             </div>
-                            <button onClick={this.predict}>Get Results</button>
                         </React.Fragment>
                         }
                     </div>
