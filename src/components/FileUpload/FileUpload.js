@@ -46,14 +46,9 @@ class FileUpload extends React.Component {
         this.fileUploadWrapper.current.classList.add(styles["loading"]);
         this.loadingRef.current.style.display = "block";
 
-        const API_URL = "http://3.69.24.26:5000";
+        const API_URL = "https://api.alzai.org/";
         const base64_image = await this.getBase64(this.state.file).then(base64_image => {
             return base64_image;
-            /*
-            let base64_image_array = base64_image.split(",");
-            base64_image_array.shift();
-            return base64_image_array.join(",");
-            */
         });
         
         const data = {
