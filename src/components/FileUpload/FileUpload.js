@@ -161,6 +161,7 @@ class FileUpload extends React.Component {
                                 <input {...getInputProps()} multiple={false}/>
                                 <p>Drag an image to learn the result</p>
                             </div>
+                                <p style={{margin: "10px auto", textAlign: "center"}}>Supported MRI format is axial and T1 weighted jpeg file.</p>
                             </div>
                         )}
                     </Dropzone>
